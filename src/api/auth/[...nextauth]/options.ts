@@ -12,39 +12,38 @@ export const authOptions: NextAuthOptions = {
             credentials: {
                 email: { label: "Email", type: "text" },
                 password: { label: "Password", type: "password" },
+            },
+            async authorize(credentials: any): Promise<any> {
+                await dbConnect();
+                try {
+                    const user = await userModel.findOne({
+                        $or: [
+                            { email: credentials.identifier },
+                            { username: credentials.identifier },
+                        ],
+                    });
 
-                async authorize(credentials: any): Promise<any> {
-                    await dbConnect();
-                    try {
-                        const user = await userModel.findOne({
-                            $or: [
-                                { email: credentials.identifier },
-                                { username: credentials.identifier },
-                            ],
-                        });
-
-                        if (!user) {
-                            throw new Error("no user found please signup");
-                        }
-
-                        if (!user.isVerified) {
-                            throw new Error("user not verified");
-                        }
-
-                        const isPasswordCorrect = await bcrypt.compare(
-                            credentials.password,
-                            user.password
-                        );
-
-                        if (isPasswordCorrect) {
-                            return user;
-                        } else {
-                            throw new Error("wrong password");
-                        }
-                    } catch (error: any) {
-                        throw new Error(error);
+                    if (!user) {
+                        throw new Error("no user found please signup");
                     }
-                },
+
+                    if (!user.isVerified) {
+                        throw new Error("user not verified");
+                    }
+
+                    const isPasswordCorrect = await bcrypt.compare(
+                        credentials.password,
+                        user.password
+                    );
+
+                    if (isPasswordCorrect) {
+                        return user;
+                    } else {
+                        throw new Error("wrong password");
+                    }
+                } catch (error: any) {
+                    throw new Error(error);
+                }
             },
         }),
     ],
@@ -75,4 +74,5 @@ export const authOptions: NextAuthOptions = {
         strategy: "jwt",
     },
     secret: process.env.NEXTAUTH_SECRET,
+  
 };
