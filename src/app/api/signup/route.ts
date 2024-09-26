@@ -3,8 +3,7 @@ import { dbConnect } from "@/lib/dbconnect";
 import userModel from "@/model/user";
 
 import bcryptjs from "bcryptjs";
-import { verify } from "crypto";
-import { use } from "react";
+
 
 export async function POST(request: Request) {
     await dbConnect();
