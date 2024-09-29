@@ -4,16 +4,20 @@ import { usernameValidation } from "@/schemas/signUpSchema";
 
 import { z } from "zod";
 
-const usernameQuerySchema = z.object({ username: usernameValidation });
+const usernameQuerySchema = z.object({
+    username: usernameValidation,
+});
 
 export async function GET(request: Request) {
-
-  if(request.method !=='GET'){
-    return Response.json({
-      sucess:false,
-      message:"method not allowed"
-    },{status:405})
-  }
+    if (request.method !== "GET") {
+        return Response.json(
+            {
+                sucess: false,
+                message: "method not allowed",
+            },
+            { status: 405 }
+        );
+    }
     await dbConnect();
 
     try {
@@ -23,11 +27,14 @@ export async function GET(request: Request) {
             username: searchParams.get("username"),
         };
 
-        const result = usernameQuerySchema.safeParse(quesryParam);
+        const result =
+            usernameQuerySchema.safeParse(quesryParam);
 
         console.log(result);
         if (!result.success) {
-            const usernameError = result.error.format().username?._errors || [];
+            const usernameError =
+                result.error.format().username?._errors ||
+                [];
 
             return Response.json(
                 {
@@ -41,20 +48,28 @@ export async function GET(request: Request) {
             );
         }
         const { username } = result.data;
-        const existedverifieduser = await userModel.findOne({
-            username,
-            isVerified: true,
-        });
+        const existedverifieduser = await userModel.findOne(
+            {
+                username,
+                isVerified: true,
+            }
+        );
 
         if (existedverifieduser) {
             return Response.json(
-                { success: false, message: "username is already taken" },
+                {
+                    success: false,
+                    message: "username is already taken",
+                },
                 { status: 400 }
             );
         }
 
         return Response.json(
-            { success: true, message: "username is unique" },
+            {
+                success: true,
+                message: "Username is unique",
+            },
             { status: 200 }
         );
     } catch (error) {
