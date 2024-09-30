@@ -36,7 +36,7 @@ function page() {
     const { toast } = useToast();
     const router = useRouter();
 
-    const form = useForm({
+    const form = useForm<z.infer<typeof signupSchema>>({
         resolver: zodResolver(signupSchema),
         defaultValues: {
             email: "",
@@ -87,7 +87,7 @@ function page() {
                 description: res.data.message,
             });
 
-            router.replace("/verify-code");
+            router.replace(`/verify/${username}`);
         } catch (error) {
             console.error("error in signup of user", error);
 
@@ -98,7 +98,7 @@ function page() {
 
             toast({
                 title: "signup failed",
-                description: "error Message",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
@@ -224,7 +224,7 @@ function page() {
                     <p>
                         Already a member?{" "}
                         <Link
-                            href="/sign-in"
+                            href="/signin"
                             className="text-blue-600 hover:text-blue-800"
                         >
                             Sign in
